@@ -1,69 +1,39 @@
-import re
 import sys
 
-from config import S_J, S_C, STATES, V_EMPTY, V_1, V_O
-from exceptions import InvalidFirstCharacter, InvalidValuesInString, InvalidLine
+from config import S_J, S_C, V_EMPTY, V_1, V_O
 
 
 class BarcodeDecoder:
     def __init__(self) -> None:
-        self.__line:str
+        self.__count=0
+        self.__state = V_EMPTY
+        self.__previous_state = None
 
-    def set_line(self,line:str)->None:
-        pattern = "^J(J|C)*$"
-        if not re.match(pattern,line):
-            raise InvalidLine()
+    def set_state_up(self):
+        if self.__count == 2:
+            self.__state = V_O
+        elif self.__count == 3:
+            self.__state = V_1
+        else:
+            self.__state =V_EMPTY
 
-        self.__line = line
-
-    def _comparing_previous_values(self,item:str, index:int, items:list[str], count:int)->tuple[str,int]:
-        result=""
-        if  item == S_C:
-            count +=1
-            result+=V_EMPTY
-        elif item == S_J: 
-            if count > 0:
-                if count == 1:
-                    result+=V_O
-                elif count == 2:
-                    result+=V_1
-                else:
-                    result+=V_EMPTY
-                count = 0
-            elif count == 0 and items[index-1]==S_J:
-                result+=V_EMPTY
-
-        return result, count
-
-    def decode(self)->None:
-        items = list(self.__line)
-        if not set(items).issubset(set(STATES)):
-            raise InvalidValuesInString()
-        
-        count = 0
-        result = ""
-
-        for index, item in enumerate(items):
-            # print(item,index)
-            if index == 0:
-                if  item == S_C:
-                    raise InvalidFirstCharacter()
-                    
-            elif index == 1:
-                if  item == S_C:
-                    count +=1
-                result+=V_EMPTY
-                
+    def decode(self, c:str)->None:
+        if c == S_J:
+            if self.__count == 0:
+                self.__count+=1
+                sys.stdout.write(V_EMPTY)
             else:
-                r, count = self._comparing_previous_values(item, index, items, count)
-                result+=r
+                self.__count = 1
+                if self.__previous_state == S_J:
+                    sys.stdout.write(V_EMPTY)
+                elif self.__previous_state == S_C:
+                    sys.stdout.write(self.__state)
 
-        r, _ = self._comparing_previous_values(item, index, items, count)
-        result+=r
+            self.__previous_state =S_J
 
-        sys.stdout.write(result)
-        # print(result)
-        # print(len(result))
-
-        # print(items)
-    
+        elif c == S_C:
+            sys.stdout.write(V_EMPTY)
+            if self.__count > 0:
+                self.__count+=1
+                self.set_state_up()
+            self.__previous_state =S_C

@@ -12,3 +12,6 @@ V_O = "0"
 V_1 = "1"
 V_EMPTY = "-"
 
+
+SIZE_OF_GENERATED_DATA = 512
+

@@ -1,4 +1,5 @@
-from stdin_reader import stdin_reader
+import sys
+from config import S_C, S_J
 from barcode_decoder import BarcodeDecoder
 
 class BarcodeReader(object):
@@ -6,8 +7,10 @@ class BarcodeReader(object):
         self.__barcode_decoder = barcode_decoder
 
     def read(self)->None:
-        with stdin_reader() as line:
-            self.__barcode_decoder.set_line(line)
-            self.__barcode_decoder.decode()
+        while True:
+            c = sys.stdin.read(1)
+            self.__barcode_decoder.decode(c)
+            if c not in (S_C, S_J):
+                break
 
             

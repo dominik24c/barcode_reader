@@ -1,14 +1,10 @@
 class BarCodeException(Exception):
     pass
 
-class InvalidValuesInString(BarCodeException):
-    """Throw if string doesn't contain only characters (S_J, S_C)"""
+class InvalidFilename(BarCodeException):
+    """Throw if filename extension is not .txt """
     pass
 
-class InvalidFirstCharacter(BarCodeException):
-    """Throw if first character is not white (S_J)"""
-    pass
-
-class InvalidLine(BarCodeException):
-    """Throw if regex is not passed the test"""
+class ArgIsRequired(BarCodeException):
+    """Throw if user doesnt passed one argument in script"""
     pass
